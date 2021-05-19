@@ -14,7 +14,7 @@ class BlogLoader {
     this.blogs = $(this.blogLoaderObject.blogHeaderSelector);
     this.blogs.each(function(i, header) {
       const headerElement = $(header);
-      const div = $('<div ></div>')
+      const div = $('<div></div>')
       div.insertAfter(headerElement);
       headerElement.data({
         'target': div,
@@ -25,9 +25,10 @@ class BlogLoader {
 
   bindEvents() {
     this.blogs.each(function() {
-      $(this).click(function(event) {
+      const blogHeaderElement = $(this)
+      blogHeaderElement.click(function(event) {
         event.preventDefault();
-        const headerData = $(this).data();
+        const headerData = blogHeaderElement.data();
         headerData.target.load(BlogLoader.loadBlogUrl + headerData.postId);
       });
     });
