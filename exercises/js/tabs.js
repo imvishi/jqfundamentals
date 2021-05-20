@@ -1,41 +1,43 @@
 class TabNavigation {
-  constructor() {
-    this.tabList = [];
+  constructor(tabNavigationObject) {
+    this.module = $(tabNavigationObject.moduleSelector);
     this.moduleMap = new Map();
-    Array.from($('.module')).map((node) => {
-      this.moduleMap.set($(node).find('h2').text(), $(node));
+    Array.from(this.module).map((node) => {
+      const moduleElement = $(node)
+      this.moduleMap.set(moduleElement.find('h2').text(), moduleElement);
     });
+  }
+
+  init() {
+    this.hideAllModules();
+    this.createTabs();
+    this.selectTab(this.tabListElement.first());
+    this.bindEvents();
+  }
+
+  hideAllModules() {
+    this.module.hide();
   }
 
   createTabs() {
-    $('.module').hide();
-    const unorderedListElement = $('<ul></ul>');
-    unorderedListElement.insertBefore('.module:first');
-    $('.module').each((index, value) => {
-      const listElement = $('<li/>').text($(value).find('h2').text())
-      unorderedListElement.append(listElement);
-      this.tabList.push(listElement);
+    let tablistElements = $()
+    this.moduleMap.forEach((value, key) => {
+      tablistElements = tablistElements.add($('<li/>').text(key));
     });
-    this.addEventListeners()
+
+    $('<ul id="tab"></ul>').append(tablistElements).insertBefore(this.module.first());
+    this.tabListElement = $('#tab li');
   }
 
-  addEventListeners() {
-    this.tabList.forEach((node) => {
-      node.bind('click', () => {
-        this.updateModuleVisibility($(node).text())
-        this.updateCurrentClass($(node).text());
-      });
+  bindEvents() {
+    this.tabListElement.click((node) => {
+      this.selectTab($(node.target));
     });
   }
 
-  updateCurrentClass(clickedTabText) {
-    this.tabList.forEach((node) => {
-      if (node.text() == clickedTabText) {
-        node.addClass('current');
-      } else {
-        node.removeClass('current');
-      }
-    });
+  selectTab(tabElement) {
+    tabElement.addClass('current').siblings().removeClass('current');
+    this.updateModuleVisibility(tabElement.text());
   }
 
   updateModuleVisibility(clickedTabText) {
@@ -50,6 +52,9 @@ class TabNavigation {
 }
 
 $(document).ready(() => {
-  const tabNavigation = new TabNavigation();
-  tabNavigation.createTabs();
+  const tabNavigationObject = {
+    moduleSelector: ".module"
+  }
+  const tabNavigation = new TabNavigation(tabNavigationObject);
+  tabNavigation.init();
 });
