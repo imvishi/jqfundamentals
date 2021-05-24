@@ -1,53 +1,40 @@
 class TabNavigation {
   constructor(tabNavigationObject) {
-    this.module = $(tabNavigationObject.moduleSelector);
-    this.moduleMap = new Map();
-    Array.from(this.module).map((node) => {
-      const moduleElement = $(node)
-      this.moduleMap.set(moduleElement.find('h2').text(), moduleElement);
-    });
+    this.modules = $(tabNavigationObject.moduleSelector);
   }
 
   init() {
     this.hideAllModules();
     this.createTabs();
-    this.selectTab(this.tabListElement.first());
+    this.selectTab(this.tabList.children().first());
     this.bindEvents();
   }
 
   hideAllModules() {
-    this.module.hide();
+    this.modules.hide();
   }
 
   createTabs() {
     let tablistElements = $()
-    this.moduleMap.forEach((value, key) => {
-      tablistElements = tablistElements.add($('<li/>').text(key));
+    this.modules.each((index, element) => {
+      const moduleElement = $(element)
+      const tab = $('<li>').text(moduleElement.find('h2').text())
+      tab.data('module', moduleElement);
+      tablistElements = tablistElements.add(tab);
     });
-
-    $('<ul id="tab"></ul>').append(tablistElements).insertBefore(this.module.first());
-    this.tabListElement = $('#tab li');
+    this.tabList = $('<ul/>')
+    this.tabList.append(tablistElements).insertBefore(this.modules.first());
   }
 
   bindEvents() {
-    this.tabListElement.click((node) => {
-      this.selectTab($(node.target));
+    this.tabList.on('click', 'li', (event) => {
+      this.selectTab($(event.target));
     });
   }
 
   selectTab(tabElement) {
     tabElement.addClass('current').siblings().removeClass('current');
-    this.updateModuleVisibility(tabElement.text());
-  }
-
-  updateModuleVisibility(clickedTabText) {
-    this.moduleMap.forEach((value, key) => {
-      if (key === clickedTabText) {
-        this.moduleMap.get(key).show();
-      } else {
-        this.moduleMap.get(key).hide();
-      }
-    });
+    tabElement.data('module').show().siblings('.module').hide();
   }
 }
 
