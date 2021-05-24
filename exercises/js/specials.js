@@ -6,13 +6,18 @@ class Special {
   }
 
   init() {
-    this.createTargetDivForSpecial();
+    this.initializeFormNodes();
     this.removeSubmitButton();
+    this.createTargetDivForSpecial();
     this.bindEvents();
   }
 
-  createTargetDivForSpecial() {
+  initializeFormNodes() {
     this.form = $(this.specialObject.formSelector);
+    this.form.data('submit', this.form.find('ul li:last'));
+  }
+
+  createTargetDivForSpecial() {
     this.specialContainer = $(`<div>
       <h2 id="title"></h2>
       <p id="text"></p>
@@ -23,25 +28,34 @@ class Special {
   }
 
   removeSubmitButton() {
-    this.form.find('input').parent().remove();
+    this.form.data('submit').remove();
   }
 
   bindEvents() {
     this.form.find('select').change((e) => {
-      if (e.target.selectedIndex > 0) {
-        if (this.specialData) {
-          this.updateSpecialContainer(e.target.value);
-        } else {
-          $.getJSON(Special.specialJsonUrl, (res) => {
-            this.specialData = res
-            this.updateSpecialContainer(e.target.value);
-          });
-        }
-      } else {
-        this.clearSpecialContainer();
-      }
+      this.handleSpecialSelection(e.target);
     });
   }
+
+  handleSpecialSelection(target) {
+    if (target.selectedIndex <= 0) {
+      this.clearSpecialContainer();
+    } else if (this.special) {
+      this.updateSpecialContainer(target.value);
+    } else {
+      this.loadSpecialData(() => {
+        this.updateSpecialContainer(target.value);
+      });
+    }
+  }
+
+  loadSpecialData(onLoadFinish) {
+    $.getJSON(Special.specialJsonUrl, (res) => {
+      this.specialData = res
+      onLoadFinish();
+    });
+  }
+
 
   updateSpecialContainer(selectedValue) {
     if (this.specialData) {
