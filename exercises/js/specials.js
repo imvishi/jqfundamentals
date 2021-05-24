@@ -2,19 +2,14 @@ class Special {
   static specialJsonUrl = 'http://localhost:8000/Documents/Ruby/Javascript/jqery/jqfundamentals/exercises/data/specials.json';
 
   constructor(specialObject) {
-    this.specialObject = specialObject;
+    this.form = $(specialObject.formSelector);
+    this.form.data('submit', this.form.find(specialObject.formSubmitButtonSelector));
   }
 
   init() {
-    this.initializeFormNodes();
     this.removeSubmitButton();
     this.createTargetDivForSpecial();
     this.bindEvents();
-  }
-
-  initializeFormNodes() {
-    this.form = $(this.specialObject.formSelector);
-    this.form.data('submit', this.form.find('ul li:last'));
   }
 
   createTargetDivForSpecial() {
@@ -32,8 +27,8 @@ class Special {
   }
 
   bindEvents() {
-    this.form.find('select').change((e) => {
-      this.handleSpecialSelection(e.target);
+    this.form.on('change', 'select', (event) => {
+      this.handleSpecialSelection(event.target);
     });
   }
 
@@ -77,7 +72,8 @@ class Special {
 
 $(document).ready(() => {
   const specialObject = {
-    formSelector: '#specials form'
+    formSelector: '#specials form',
+    formSubmitButtonSelector: '#special-submit'
   }
   const special = new Special(specialObject);
   special.init();
