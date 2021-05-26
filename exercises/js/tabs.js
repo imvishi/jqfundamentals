@@ -33,8 +33,14 @@ class TabNavigation {
   }
 
   selectTab(tabElement) {
-    tabElement.addClass('current').siblings().removeClass('current');
-    tabElement.data('module').show().siblings('.module').hide();
+    // change current tab
+    this.tabList.find('li').not(tabElement).removeClass('current');
+    tabElement.addClass('current');
+
+    // show current module
+    const selectedModule = tabElement.data('module');
+    this.modules.not(selectedModule).hide();
+    selectedModule.show();
   }
 }
 
