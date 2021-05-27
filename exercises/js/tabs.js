@@ -6,7 +6,7 @@ class TabNavigation {
   init() {
     this.hideAllModules();
     this.createTabs();
-    this.selectTab(this.tabList.children().first());
+    this.selectTab(this.tabList.find('li:first'));
     this.bindEvents();
   }
 
@@ -34,12 +34,12 @@ class TabNavigation {
 
   selectTab(tabElement) {
     // change current tab
-    this.tabList.find('li').not(tabElement).removeClass('current');
+    this.tabList.find('li').removeClass('current');
     tabElement.addClass('current');
 
     // show current module
     const selectedModule = tabElement.data('module');
-    this.modules.not(selectedModule).hide();
+    this.modules.hide();
     selectedModule.show();
   }
 }
